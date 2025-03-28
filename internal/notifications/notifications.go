@@ -1,7 +1,7 @@
 package notifications
 
 import (
-	"helagro/look_away/internal/config"
+	"github.com/helagro/look_away/internal/config"
 
 	"github.com/gen2brain/beeep"
 )

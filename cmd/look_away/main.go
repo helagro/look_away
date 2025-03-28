@@ -4,12 +4,13 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"helagro/look_away/internal/config"
-	"helagro/look_away/internal/timer"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/helagro/look_away/internal/config"
+	"github.com/helagro/look_away/internal/timer"
 
 	"gopkg.in/yaml.v3"
 )

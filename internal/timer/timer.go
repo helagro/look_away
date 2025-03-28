@@ -3,10 +3,11 @@ package timer
 import (
 	"context"
 	"fmt"
-	"helagro/look_away/internal/config"
-	"helagro/look_away/internal/notifications"
 	"os/exec"
 	"time"
+
+	"github.com/helagro/look_away/internal/config"
+	"github.com/helagro/look_away/internal/notifications"
 )
 
 type Timer struct {
