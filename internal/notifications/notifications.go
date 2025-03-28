@@ -1,7 +1,7 @@
 package notifications
 
 import (
-	"jnsltk/look_away/internal/config"
+	"helagro/look_away/internal/config"
 
 	"github.com/gen2brain/beeep"
 )

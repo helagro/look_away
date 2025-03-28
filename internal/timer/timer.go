@@ -3,8 +3,8 @@ package timer
 import (
 	"context"
 	"fmt"
-	"jnsltk/look_away/internal/config"
-	"jnsltk/look_away/internal/notifications"
+	"helagro/look_away/internal/config"
+	"helagro/look_away/internal/notifications"
 	"os/exec"
 	"time"
 )

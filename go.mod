@@ -1,4 +1,4 @@
-module jnsltk/look_away
+module helagro/look_away
 
 go 1.23.4
 

@@ -6,7 +6,7 @@ Simple 20-20-20 rule timer app for the terminal written in go.
 ## Install
 
 ```sh
-git clone https://github.com/jnsltk/look_away.git && cd look_away
+git clone https://github.com/helagro/look_away.git && cd look_away
 go install ./cmd/look_away
 ```
 
