@@ -51,7 +51,10 @@ func (t *Timer) Start(ctx context.Context) {
 				case <-ticker.C:
 					minutes := int(remaining.Minutes())
 					seconds := int(remaining.Seconds()) % 60
-					fmt.Printf("\r%02d:%02d remaining", minutes, seconds)
+
+					if minutes%10 == 0 && seconds == 0 {
+						fmt.Printf("\r%02d:%02d remaining", minutes, seconds)
+					}
 				}
 			}
 			timer.Stop()
