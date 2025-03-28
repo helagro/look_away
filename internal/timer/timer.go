@@ -29,11 +29,12 @@ func (t *Timer) Start(ctx context.Context) {
 	}
 
 	for {
+
 		for i, duration := range durations {
 			timer := time.NewTimer(duration)
 			ticker := time.NewTicker(1 * time.Second)
 
-			innerloop:
+		innerloop:
 			for remaining := duration; remaining > 0; remaining -= 1 * time.Second {
 				select {
 				case <-ctx.Done():

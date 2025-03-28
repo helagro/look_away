@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"jnsltk/look_away/internal/config"
@@ -11,32 +10,14 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"syscall"
 
 	"gopkg.in/yaml.v3"
 )
 
-const APP_NAME string = "look_away"
-const CONFIG_FILE_NAME string = "config.yaml"
-
 func main() {
-	userConfigDir, err := os.UserConfigDir()
-	if err != nil {
-		log.Fatalf("User config directory not found", err)
-	}
 
-	configPath := filepath.Join(userConfigDir, APP_NAME, CONFIG_FILE_NAME)
-
-	if _, err := os.Stat(configPath); errors.Is(err, os.ErrNotExist) {
-		fmt.Println("Config file not found. Creating default config...")
-		err := createDefaultConfig(configPath)
-		if err != nil {
-			log.Fatalf("Error creating default config", err)
-		}
-	}
-
-	cfg, err := config.LoadConfig(configPath)
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		fmt.Println("Error loading config:", err)
 		return
@@ -67,7 +48,13 @@ func main() {
 	}
 
 	if showConfigLocation {
-		fmt.Println(configPath)
+		configPath, err := config.GetConfigPath()
+		if err == nil {
+			fmt.Println(configPath)
+		} else {
+			fmt.Fprintln(os.Stderr, "Error getting config path:", err)
+		}
+
 		return
 	}
 
@@ -100,36 +87,6 @@ func main() {
 	<-quitChan
 
 	fmt.Println("\nQuitting application...")
-}
-
-func createDefaultConfig(configPath string) error {
-	defaultConfig := config.AppConfig{
-		Timer: config.TimerConfig{
-			DurationMinutes: 20,
-			BreakSeconds:    20,
-		},
-		Notifications: config.NotificationConfig{
-			UseAlert: true,
-		},
-	}
-
-	data, err := yaml.Marshal(defaultConfig)
-	if err != nil {
-		return err
-	}
-
-	configDir := filepath.Dir(configPath)
-	err = os.MkdirAll(configDir, os.ModePerm)
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile(configPath, data, 0644)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func printHelp() {
