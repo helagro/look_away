@@ -3,30 +3,26 @@ package timer
 import (
 	"context"
 	"fmt"
+	"jnsltk/look_away/internal/config"
 	"jnsltk/look_away/internal/notifications"
+	"os/exec"
 	"time"
 )
 
 type Timer struct {
 	TimerDuration time.Duration
 	BreakDuration time.Duration
-	Notifier      *notifications.Notifier
 }
 
-func NewTimer(duration time.Duration, breakDuration time.Duration, notifier *notifications.Notifier) *Timer {
+func NewTimer(duration time.Duration, breakDuration time.Duration) *Timer {
 	return &Timer{
 		duration,
 		breakDuration,
-		notifier,
 	}
 }
 
 func (t *Timer) Start(ctx context.Context) {
 	durations := []time.Duration{t.TimerDuration, t.BreakDuration}
-	notificationMessages := []string{
-		"Time to rest your eyes! Look at least 20 ft (~6m) away for at least 20 seconds!",
-		"That's enough, go back to work!",
-	}
 
 	for {
 
@@ -41,7 +37,16 @@ func (t *Timer) Start(ctx context.Context) {
 					timer.Stop()
 					ticker.Stop()
 				case <-timer.C:
-					t.Notifier.Notify(notificationMessages[i])
+					cfg, err := config.LoadConfig()
+					if err != nil {
+						fmt.Println("Error loading config:", err)
+						return
+					}
+
+					notifier := notifications.NewNotifier(cfg.Notifications)
+					message := getNotificationMessage(i, cfg.Notifications.TextCommand)
+
+					notifier.Notify(message)
 					break innerloop
 				case <-ticker.C:
 					minutes := int(remaining.Minutes())
@@ -52,5 +57,28 @@ func (t *Timer) Start(ctx context.Context) {
 			timer.Stop()
 			ticker.Stop()
 		}
+	}
+}
+
+func getNotificationMessage(i int, textCommand string) string {
+	switch i {
+	case 0:
+		if textCommand != "" {
+			cmd := exec.Command(textCommand)
+
+			output, err := cmd.Output()
+			if err == nil {
+				return string(output)
+			} else {
+
+				return "Error executing command: " + err.Error()
+			}
+		} else {
+			return "Time to rest your eyes! Look at least 20 ft (~6m) away for at least 20 seconds!"
+		}
+	case 1:
+		return "That's enough, go back to work!"
+	default:
+		return ""
 	}
 }

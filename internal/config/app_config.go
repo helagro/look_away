@@ -18,7 +18,8 @@ type TimerConfig struct {
 }
 
 type NotificationConfig struct {
-	UseAlert bool `yaml:"use_alert"`
+	UseAlert    bool   `yaml:"use_alert"`
+	TextCommand string `yaml:"text_command"`
 }
 
 type AppConfig struct {
@@ -77,7 +78,8 @@ func createDefaultConfig(configPath string) error {
 			BreakSeconds:    20,
 		},
 		Notifications: NotificationConfig{
-			UseAlert: true,
+			UseAlert:    true,
+			TextCommand: "echo 'Time to rest your eyes! Look at least 20 ft (~6m) away for at least 20 seconds!'",
 		},
 	}
 

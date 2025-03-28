@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"jnsltk/look_away/internal/config"
-	"jnsltk/look_away/internal/notifications"
 	"jnsltk/look_away/internal/timer"
 	"log"
 	"os"
@@ -70,8 +69,7 @@ func main() {
 		cfg.Timer.BreakSeconds = customBreakDuration
 	}
 
-	notifier := notifications.NewNotifier(cfg.Notifications)
-	t := timer.NewTimer(cfg.GetTimerDuration(), cfg.GetBreakSeconds(), notifier)
+	t := timer.NewTimer(cfg.GetTimerDuration(), cfg.GetBreakSeconds())
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
