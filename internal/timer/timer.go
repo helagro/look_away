@@ -3,7 +3,6 @@ package timer
 import (
 	"context"
 	"fmt"
-	"os/exec"
 	"time"
 
 	"github.com/helagro/look_away/internal/config"
@@ -23,9 +22,9 @@ func NewTimer(duration time.Duration, breakDuration time.Duration) *Timer {
 }
 
 func (t *Timer) Start(ctx context.Context) {
-	durations := []time.Duration{t.TimerDuration, t.BreakDuration}
 
 	for {
+		durations := []time.Duration{t.TimerDuration, t.BreakDuration}
 
 		for i, duration := range durations {
 			timer := time.NewTimer(duration)
@@ -44,10 +43,11 @@ func (t *Timer) Start(ctx context.Context) {
 						return
 					}
 
+					t.TimerDuration = time.Duration(cfg.Timer.DurationMinutes)
+					t.BreakDuration = time.Duration(cfg.Timer.BreakSeconds)
 					notifier := notifications.NewNotifier(cfg.Notifications)
-					message := getNotificationMessage(i, cfg.Notifications.TextCommand)
+					notifier.Notify(i)
 
-					notifier.Notify(message)
 					break innerloop
 				case <-ticker.C:
 					minutes := int(remaining.Minutes())
@@ -61,28 +61,5 @@ func (t *Timer) Start(ctx context.Context) {
 			timer.Stop()
 			ticker.Stop()
 		}
-	}
-}
-
-func getNotificationMessage(i int, textCommand string) string {
-	switch i {
-	case 0:
-		if textCommand != "" {
-			cmd := exec.Command(textCommand)
-
-			output, err := cmd.Output()
-			if err == nil {
-				return string(output)
-			} else {
-
-				return "Error executing command: " + err.Error()
-			}
-		} else {
-			return "Time to rest your eyes! Look at least 20 ft (~6m) away for at least 20 seconds!"
-		}
-	case 1:
-		return "That's enough, go back to work!"
-	default:
-		return ""
 	}
 }
