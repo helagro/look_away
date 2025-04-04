@@ -4,12 +4,14 @@ import (
 	"os/exec"
 
 	"github.com/helagro/look_away/internal/config"
+	"github.com/helagro/look_away/internal/utils"
 
 	"github.com/gen2brain/beeep"
 )
 
 const (
 	notificationHeader = "Look away"
+	breakEndMessage    = "That's enough, go back to work!"
 )
 
 type Notifier struct {
@@ -34,6 +36,7 @@ func (n *Notifier) Notify(i int) {
 
 func (n *Notifier) NotifyStart() {
 	message := getCommandMessage(n.config.TextCommand)
+	utils.Log(message)
 
 	if n.config.UseAlert {
 		beeep.Alert(notificationHeader, message, "")
@@ -58,10 +61,11 @@ func getCommandMessage(textCommand string) string {
 }
 
 func (n *Notifier) NotifyEnd() {
-	beeep.Notify(notificationHeader, "That's enough, go back to work!", "")
+	beeep.Notify(notificationHeader, breakEndMessage, "")
+	utils.Log(breakEndMessage)
 
 	if n.config.UseAlert {
-		for i := 0; i < 3; i++ {
+		for i := 0; i < 4; i++ {
 			beeep.Beep(400, 100)
 		}
 	}

@@ -10,21 +10,22 @@ import (
 )
 
 type Timer struct {
-	TimerDuration time.Duration
-	BreakDuration time.Duration
 }
 
 func NewTimer(duration time.Duration, breakDuration time.Duration) *Timer {
-	return &Timer{
-		duration,
-		breakDuration,
-	}
+	return &Timer{}
 }
 
 func (t *Timer) Start(ctx context.Context) {
 
 	for {
-		durations := []time.Duration{t.TimerDuration, t.BreakDuration}
+		cfg, err := config.LoadConfig()
+		if err != nil {
+			fmt.Println("Error loading config:", err)
+			return
+		}
+
+		durations := []time.Duration{cfg.GetTimerDuration(), cfg.GetBreakSeconds()}
 
 		for i, duration := range durations {
 			timer := time.NewTimer(duration)
@@ -37,14 +38,6 @@ func (t *Timer) Start(ctx context.Context) {
 					timer.Stop()
 					ticker.Stop()
 				case <-timer.C:
-					cfg, err := config.LoadConfig()
-					if err != nil {
-						fmt.Println("Error loading config:", err)
-						return
-					}
-
-					t.TimerDuration = time.Duration(cfg.Timer.DurationMinutes)
-					t.BreakDuration = time.Duration(cfg.Timer.BreakSeconds)
 					notifier := notifications.NewNotifier(cfg.Notifications)
 					notifier.Notify(i)
 
