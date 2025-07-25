@@ -36,7 +36,7 @@ func (n *Notifier) Notify(i int) {
 
 func (n *Notifier) NotifyStart() {
 	message := getCommandMessage(n.config.TextCommand)
-	utils.Log(message)
+	utils.Log(message, false)
 
 	if n.config.UseAlert {
 		beeep.Alert(notificationHeader, message, "")
@@ -53,6 +53,8 @@ func getCommandMessage(textCommand string) string {
 		if err == nil {
 			return string(output)
 		} else {
+			var errorMessage = "Error executing command: " + err.Error()
+			utils.Log(errorMessage, true)
 			return "Error executing command: " + err.Error()
 		}
 	} else {
@@ -62,7 +64,7 @@ func getCommandMessage(textCommand string) string {
 
 func (n *Notifier) NotifyEnd() {
 	beeep.Notify(notificationHeader, breakEndMessage, "")
-	utils.Log(breakEndMessage)
+	utils.Log(breakEndMessage, false)
 
 	if n.config.UseAlert {
 		for i := 0; i < 4; i++ {

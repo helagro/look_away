@@ -46,15 +46,16 @@ func main() {
 		return
 	}
 
+	// Show config location
+	configPath, err := config.GetConfigPath()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error getting config path:", err)
+	}
 	if showConfigLocation {
-		configPath, err := config.GetConfigPath()
-		if err == nil {
-			fmt.Println(configPath)
-		} else {
-			fmt.Fprintln(os.Stderr, "Error getting config path:", err)
-		}
-
+		fmt.Println(configPath)
 		return
+	} else {
+		fmt.Println("Using config file:", configPath)
 	}
 
 	if printConfig {

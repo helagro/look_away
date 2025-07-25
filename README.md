@@ -45,6 +45,7 @@ timer:
     break_seconds: 20
 notifications:
     use_alert: false
+    text_command: '/Users/h/.dotfiles/scripts/lang/shell/on_break_timer.sh'
 ```
 
 To find your default config location type:
