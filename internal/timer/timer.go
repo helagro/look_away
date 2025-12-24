@@ -39,15 +39,23 @@ func (t *Timer) Start(ctx context.Context) {
 					ticker.Stop()
 				case <-timer.C:
 					notifier := notifications.NewNotifier(cfg.Notifications)
-					notifier.Notify(i)
+
+					if i == 0 {
+						notifier.Notify(notifications.NotificationStart)
+					} else {
+						notifier.Notify(notifications.NotificationEnd)
+					}
 
 					break innerloop
 				case <-ticker.C:
 					minutes := int(remaining.Minutes())
-					seconds := int(remaining.Seconds()) % 60
 
-					if minutes%10 == 0 && seconds == 0 {
-						fmt.Printf("\r%02d:%02d remaining", minutes, seconds)
+					if minutes%10 == 0 {
+						seconds := int(remaining.Seconds()) % 60
+
+						if seconds == 0 {
+							fmt.Printf("\r%02d:%02d remaining\n", minutes, seconds)
+						}
 					}
 				}
 			}

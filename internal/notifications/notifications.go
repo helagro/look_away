@@ -1,8 +1,6 @@
 package notifications
 
 import (
-	"os/exec"
-
 	"github.com/helagro/look_away/internal/config"
 	"github.com/helagro/look_away/internal/utils"
 
@@ -10,8 +8,15 @@ import (
 )
 
 const (
-	notificationHeader = "Look away"
+	notificationHeader = "Blink timer"
 	breakEndMessage    = "That's enough, go back to work!"
+)
+
+type NotificationType int
+
+const (
+	NotificationStart NotificationType = iota
+	NotificationEnd
 )
 
 type Notifier struct {
@@ -22,21 +27,29 @@ func NewNotifier(cfg config.NotificationConfig) *Notifier {
 	return &Notifier{config: cfg}
 }
 
-func (n *Notifier) Notify(i int) {
+func (n *Notifier) Notify(i NotificationType) {
 	switch i {
-	case 0:
-		n.NotifyStart()
-	case 1:
-		n.NotifyEnd()
+	case NotificationStart:
+		n.notifyStart()
+	case NotificationEnd:
+		n.notifyEnd()
 	default:
 		beeep.Alert(notificationHeader, "Invalid notification type", "")
 	}
-
 }
 
-func (n *Notifier) NotifyStart() {
-	message := getCommandMessage(n.config.TextCommand)
-	utils.Log(message, false)
+/* ================================= PRIVATE ================================ */
+
+func (n *Notifier) notifyStart() {
+	if !n.config.ShowNotification {
+		utils.Log("Notifications are disabled, skipping notification", false)
+		return
+	}
+
+	message, err := getNotificationMessage(n.config.TextCommand)
+	if err != nil {
+		return
+	}
 
 	if n.config.UseAlert {
 		beeep.Alert(notificationHeader, message, "")
@@ -45,25 +58,11 @@ func (n *Notifier) NotifyStart() {
 	}
 }
 
-func getCommandMessage(textCommand string) string {
-	if textCommand != "" {
-		cmd := exec.Command(textCommand)
-
-		output, err := cmd.Output()
-		if err == nil {
-			return string(output)
-		} else {
-			var errorMessage = "Error executing command: " + err.Error()
-			utils.Log(errorMessage, true)
-			return "Error executing command: " + err.Error()
-		}
-	} else {
-		return "Time to rest your eyes! Look at least 6m away for at least 20 seconds!"
+func (n *Notifier) notifyEnd() {
+	if n.config.ShowNotification {
+		beeep.Notify(notificationHeader, breakEndMessage, "")
 	}
-}
 
-func (n *Notifier) NotifyEnd() {
-	beeep.Notify(notificationHeader, breakEndMessage, "")
 	utils.Log(breakEndMessage, false)
 
 	if n.config.UseAlert {

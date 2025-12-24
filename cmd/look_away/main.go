@@ -54,8 +54,6 @@ func main() {
 	if showConfigLocation {
 		fmt.Println(configPath)
 		return
-	} else {
-		fmt.Println("Using config file:", configPath)
 	}
 
 	if printConfig {
@@ -80,6 +78,8 @@ func main() {
 
 	fmt.Println("20-20-20 timer started!")
 	fmt.Println("Press Ctrl+C to quit.")
+
+	fmt.Println("Using config file:", configPath)
 
 	go t.Start(ctx)
 

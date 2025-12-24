@@ -18,8 +18,9 @@ type TimerConfig struct {
 }
 
 type NotificationConfig struct {
-	UseAlert    bool   `yaml:"use_alert"`
-	TextCommand string `yaml:"text_command"`
+	UseAlert         bool   `yaml:"use_alert"`
+	TextCommand      string `yaml:"text_command"`
+	ShowNotification bool   `yaml:"show_notification"`
 }
 
 type AppConfig struct {
@@ -29,10 +30,10 @@ type AppConfig struct {
 
 /* ================================ VARIABLES =============================== */
 
-const APP_NAME string = "look_away"
-const CONFIG_FILE_NAME string = "config.yaml"
+const AppName string = "look_away"
+const ConfigFileName string = "config.yaml"
 
-/* ================================ FUNCTIONS =============================== */
+/* ================================ PUBLIC FUNCTIONS =============================== */
 
 func LoadConfig() (*AppConfig, error) {
 	path, err := GetConfigPath()
@@ -67,9 +68,19 @@ func GetConfigPath() (string, error) {
 		return "", fmt.Errorf("user config directory not found: %v", err)
 	}
 
-	configPath := filepath.Join(userConfigDir, APP_NAME, CONFIG_FILE_NAME)
+	configPath := filepath.Join(userConfigDir, AppName, ConfigFileName)
 	return configPath, nil
 }
+
+func (c *AppConfig) GetTimerDuration() time.Duration {
+	return time.Duration(c.Timer.DurationMinutes) * time.Minute
+}
+
+func (c *AppConfig) GetBreakSeconds() time.Duration {
+	return time.Duration(c.Timer.BreakSeconds) * time.Second
+}
+
+/* ================================= PRIVATE FUNCTIONS ================================ */
 
 func createDefaultConfig(configPath string) error {
 	defaultConfig := AppConfig{
@@ -78,8 +89,9 @@ func createDefaultConfig(configPath string) error {
 			BreakSeconds:    20,
 		},
 		Notifications: NotificationConfig{
-			UseAlert:    true,
-			TextCommand: "echo 'Time to rest your eyes! Look at least 20 ft (~6m) away for at least 20 seconds!'",
+			UseAlert:         true,
+			ShowNotification: true,
+			TextCommand:      "echo 'Time to rest your eyes! Look at least 20 ft (~6m) away for at least 20 seconds!'",
 		},
 	}
 
@@ -100,12 +112,4 @@ func createDefaultConfig(configPath string) error {
 	}
 
 	return nil
-}
-
-func (c *AppConfig) GetTimerDuration() time.Duration {
-	return time.Duration(c.Timer.DurationMinutes) * time.Minute
-}
-
-func (c *AppConfig) GetBreakSeconds() time.Duration {
-	return time.Duration(c.Timer.BreakSeconds) * time.Second
 }
