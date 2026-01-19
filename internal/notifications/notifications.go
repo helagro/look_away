@@ -28,9 +28,14 @@ func NewNotifier(cfg config.NotificationConfig) *Notifier {
 }
 
 func (n *Notifier) Notify(i NotificationType) {
+	message, err := getNotificationMessage(n.config.TextCommand)
+	if err != nil {
+		return
+	}
+
 	switch i {
 	case NotificationStart:
-		n.notifyStart()
+		n.notifyStart(message)
 	case NotificationEnd:
 		n.notifyEnd()
 	default:
@@ -40,14 +45,9 @@ func (n *Notifier) Notify(i NotificationType) {
 
 /* ================================= PRIVATE ================================ */
 
-func (n *Notifier) notifyStart() {
+func (n *Notifier) notifyStart(message string) {
 	if !n.config.ShowNotification {
 		utils.Log("Notifications are disabled, skipping notification", false)
-		return
-	}
-
-	message, err := getNotificationMessage(n.config.TextCommand)
-	if err != nil {
 		return
 	}
 
